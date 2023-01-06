@@ -17,3 +17,5 @@ class Webcam:
 
     def individual_frames(self):
         pass
+
+#
