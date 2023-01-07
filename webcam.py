@@ -25,7 +25,9 @@ class Webcam:
         else:
             return None
 
-# test
-    
+
+    def __del__(self):
+        if self.webcam.isOpened():
+            self.webcam.release()
 
 
