@@ -3,7 +3,6 @@ This file is responsible for the graphical user interface. This will be done wit
 '''
 
 import tkinter as tk
-import customtkinter as ctk
 import cv2
 import numpy as np
 import os 
@@ -22,24 +21,23 @@ class GUI:
         self.previous = 0
         self.enablemodel = False
         self.webcam = webcam.Webcam()
-
-        self.delay = 15
-        self.window.attributes("-topmost", True)
         self.initialize_gui()
+        self.delay = 15
         self.update()
+        self.window.attributes("-topmost", True)
+        self.window.mainloop()
 
     def initialize_gui(self):
+        self.model = trainingmodel.Model()
         self.canvas = tk.Canvas(self.window, width=self.webcam.width, height=self.webcam.height)
         self.canvas.pack()
-        self.btn_toggle_counter = tk.Button(self.window, text='Toggle Counting', command='self.toggle_counting')
+        self.btn_toggle_counter = tk.Button(self.window, text='Toggle Counting', width=50, command=self.toggle_counting)
         self.btn_toggle_counter.pack(anchor=tk.CENTER, expand=True)
-
-        self.model = trainingmodel.Model()
 
         self.btn_class_one = tk.Button(self.window, text='Extended', width=50, command=lambda: self.save_for_class(1))
         self.btn_class_one.pack(anchor=tk.CENTER, expand=True)
 
-        self.btn_class_one = tk.Button(self.window, text='Contracted',width=50, command=lambda: self.save_for_class(2))
+        self.btn_class_two = tk.Button(self.window, text='Contracted',width=50, command=lambda: self.save_for_class(2))
         self.btn_class_two.pack(anchor=tk.CENTER, expand=True)
 
         self.btn_train = tk.Button(self.window, text='Train Model',width=50, command=lambda: self.model.train_model(self.counters))
@@ -48,21 +46,21 @@ class GUI:
         self.btn_reset = tk.Button(self.window, text='Reset',width=50, command=self.reset)
         self.btn_reset.pack(anchor=tk.CENTER, expand=True)
 
-        self.main_label = tk.Label(self.window, text=f"{self.rep_counter}")
+        self.main_label = tk.Label(self.window, text=f"{self.movement_counter}")
         self.main_label.config(font=('Arial', 24))
         self.main_label.pack(anchor=tk.CENTER, expand=True)
 
     def update(self):
-        if self.enable_model:
+        if self.enablemodel:
             self.predict()
         if self.lengthened and self.contracted:
             self.lengthened, self.contracted = False, False
             self.rep_counter += 1
-        self.main_label.config(text=f'{self.rep_counter}')
+        self.main_label.config(text=f'{self.movement_counter}')
         ret, frame = self.webcam.individual_frames()
         if ret:
-            self.photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame), anchor=tk.NW)
-            self.convas.create_image(0, 0, image=self.photo)
+            self.photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
+            self.canvas.create_image(0, 0, image=self.photo)
 
         self.window.after(self.delay, self.update)
 
@@ -78,7 +76,7 @@ class GUI:
                 self.previous = 2
 
     def toggle_counting(self):
-        self.enable_model = not self.enable_model
+        self.enablemodel = not self.enable_model
 
     def save_for_class(self, class_num):
         ret, frame = self.webcam.individual_frames()
@@ -96,8 +94,6 @@ class GUI:
     def reset(self):
         self.movement_counter = 0
 
-    def rep_counter(self):
-        pass
 
 
 
