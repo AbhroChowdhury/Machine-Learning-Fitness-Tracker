@@ -13,7 +13,7 @@ import trainingmodel
 
 class GUI:
     def __init__(self):
-        self.window = ctk.CTk()
+        self.window = tk.Tk()
         self.window.title = "Machine Learning Fitness Tracker"
         self.counters = [1, 1]
         self.movement_counter = 0
@@ -24,36 +24,47 @@ class GUI:
         self.camera = webcam.Webcam()
 
         self.delay = 15
-        self.update()
         self.window.attributes("-topmost", True)
         self.initialize_gui()
+        self.update()
 
     def initialize_gui(self):
-        self.canvas = ctk.CTkCanvas(self.window, width=self.webcam.width, height=self.webcam.height)
+        self.canvas = tk.TkCanvas(self.window, width=self.webcam.width, height=self.webcam.height)
         self.canvas.pack()
-        self.btn_toggle_counter = ctk.CTkButton(self.window, text='Toggle Counting', command='self.toggle_counting')
+        self.btn_toggle_counter = tk.TkButton(self.window, text='Toggle Counting', command='self.toggle_counting')
         self.btn_toggle_counter.pack(anchor=tk.CENTER, expand=True)
 
         self.model = trainingmodel.Model()
 
-        self.btn_class_one = ctk.CTkButton(self.window, text='Extended', width=50, command=lambda: self.save_for_class(1))
+        self.btn_class_one = tk.TkButton(self.window, text='Extended', width=50, command=lambda: self.save_for_class(1))
         self.btn_class_one.pack(anchor=tk.CENTER, expand=True)
 
-        self.btn_class_one = ctk.CTkButton(self.window, text='Contracted',width=50, command=lambda: self.save_for_class(2))
+        self.btn_class_one = tk.TkButton(self.window, text='Contracted',width=50, command=lambda: self.save_for_class(2))
         self.btn_class_two.pack(anchor=tk.CENTER, expand=True)
 
-        self.btn_train = ctk.CTkButton(self.window, text='Train Model',width=50, command=lambda: self.model.train_model(self.counters))
+        self.btn_train = tk.TkButton(self.window, text='Train Model',width=50, command=lambda: self.model.train_model(self.counters))
         self.btn_train.pack(anchor=tk.CENTER, expand=True)
 
-        self.btn_reset = ctk.CTkButton(self.window, text='Reset',width=50, command=self.reset)
+        self.btn_reset = tk.TkButton(self.window, text='Reset',width=50, command=self.reset)
         self.btn_reset.pack(anchor=tk.CENTER, expand=True)
 
-        self.main_label = ctk.CTkLabel(self.window, text=f"{self.rep_counter}")
+        self.main_label = tk.TkLabel(self.window, text=f"{self.rep_counter}")
         self.main_label.config(font=('Arial', 24))
         self.main_label.pack(anchor=tk.CENTER, expand=True)
 
     def update(self):
-        pass
+        if self.enable_model:
+            self.predict()
+        if self.lengthened and self.contracted:
+            self.lengthened, self.contracted = False, False
+            self.rep_counter += 1
+        self.main_label.config(text=f'{self.rep_counter}')
+        ret, frame = self.webcam.individual_frames()
+        if ret:
+            self.photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame), anchor=tk.NW)
+            self.convas.create_image(0, 0, image=self.photo)
+
+        self.window.after(self.delay, self.update)
 
     def predict(self):
         frame = self.webcam.get_frame()
