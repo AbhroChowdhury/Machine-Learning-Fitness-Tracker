@@ -21,10 +21,11 @@ class GUI:
         self.previous = 0
         self.enablemodel = False
         self.camera = webcam.Webcam()
-        self.initialize_gui()
+
         self.delay = 15
         self.update()
         self.window.attributes("-topmost", True)
+        self.initialize_gui()
 
     def initialize_gui(self):
         self.canvas = ctk.CTkCanvas(self.window, width=self.webcam.width, height=self.webcam.height)
@@ -53,13 +54,29 @@ class GUI:
     def update(self):
         pass
 
-    def toggle_counting(self):
-        
-
-    def save_for_class(self, class_num):
+    def predict(self):
         pass
 
+    def toggle_counting(self):
+        self.enable_model = not self.enable_model
+
+    def save_for_class(self, class_num):
+        ret, frame = self.webcam.individual_frames()
+        if not os.path.exists('1'):
+            os.mkdir('1')
+        if not os.path.exists('2'):
+            os.mkdir('2')
+        
+        cv2.imwrite(f"{class_num}/frame{self.counters[class_num-1]}.jpg", cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY))
+        img = PIL.Image.open(f"{class_num}/frame{self.counters[class_num-1]}.jpg")
+        img.thumbnail((150,150), PIL.Image.ANTIALIAS)
+        img.save(f"{class_num}/frame{self.counters[class_num-1]}.jpg")
+        self.counters[class_num-1] += 1
+
     def reset(self):
+        self.movement_counter = 0
+
+    def rep_counter(self):
         pass
 
 
