@@ -5,4 +5,5 @@ INSTRUCTIONS:
 
 1.) activate virtual environment with source env/bin/activate
 2.) pip install pillow, opencv-python, sklearn
-3.)
+3.) pip install -U scikit-learn
+
