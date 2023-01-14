@@ -9,6 +9,7 @@ import numpy as np
 import os 
 import PIL.Image, PIL.ImageTk
 import webcam
+import trainingmodel
 
 class GUI:
     def __init__(self):
@@ -33,7 +34,7 @@ class GUI:
         self.btn_toggle_counter = ctk.CTkButton(self.window, text='Toggle Counting', command='self.toggle_counting')
         self.btn_toggle_counter.pack(anchor=tk.CENTER, expand=True)
 
-        self.model = None
+        self.model = trainingmodel.Model()
 
         self.btn_class_one = ctk.CTkButton(self.window, text='Extended', width=50, command=lambda: self.save_for_class(1))
         self.btn_class_one.pack(anchor=tk.CENTER, expand=True)
@@ -55,7 +56,15 @@ class GUI:
         pass
 
     def predict(self):
-        pass
+        frame = self.webcam.get_frame()
+        prediction = self.model.predict(frame)
+        if prediction != self.previous:
+            if prediction == 1:
+                self.lengthened = True
+                self.previous = 1
+            if prediction == 2:
+                self.contracted = True
+                self.previous = 2
 
     def toggle_counting(self):
         self.enable_model = not self.enable_model
